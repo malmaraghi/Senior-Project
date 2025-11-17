@@ -1,0 +1,4 @@
+mariadb
+mysql-connector-python
+tabulate
+ollama
