@@ -7,7 +7,6 @@ def run_query(sql_query, conn, auto_commit=True):
     sql_lower = sql_query.strip().lower()
 
     try:
-        # Handle read-type queries
         if sql_lower.startswith(("select", "show", "describe", "explain")):
             cur.execute(sql_query)
             rows = cur.fetchall()
@@ -18,7 +17,6 @@ def run_query(sql_query, conn, auto_commit=True):
                 print("\nQuery Results:\n")
                 print(tabulate(rows, headers=col_names, tablefmt="fancy_grid"))
         else:
-            # Handle write-type queries
             cur.execute(sql_query)
             print(f"Query executed successfully. ({cur.rowcount} rows affected)")
 
@@ -27,8 +25,9 @@ def run_query(sql_query, conn, auto_commit=True):
                 print("Changes committed.\n")
             else:
                 print("Transaction pending (not committed yet). Use COMMIT or ROLLBACK.\n")
-
     except mariadb.Error as e:
-        print(f"SQL Error: {e}\n")
+        print(f"SQL Error: {e}\nThe query could not be executed. Please rephrase your request or check the generated SQL.\n")
+    except Exception as e:
+        print(f"Unexpected error: {e}\n")
     finally:
         cur.close()

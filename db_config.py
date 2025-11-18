@@ -6,13 +6,11 @@ DB_CONFIG = {
     "password": "password",
     "host": "localhost",
     "port": 3306,
-    "database": "bank_demo_large"
+    "database": "bank_demo"
 }
 
 def connect_db():
-    """
-    Create and return a MariaDB connection using credentials defined in DB_CONFIG.
-    """
+    """Create and return a MariaDB connection using credentials defined in DB_CONFIG."""
     try:
         conn = mariadb.connect(**DB_CONFIG)
         return conn

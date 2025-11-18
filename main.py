@@ -2,41 +2,35 @@ from db_config import connect_db
 from llm_engine import ask_llm
 from query_executor import run_query
 from schema_loader import load_schema
+from chroma_rag import index_schema_in_chroma, retrieve_schema_context
 
 def main():
-    print("\nText-to-SQL Chatbot (Full Database Access Mode)")
-    print("--------------------------------")
-    print("Usage:")
-    print(" - SELECT:   Retrieve data (e.g., list all customers)")
-    print(" - INSERT:   Add new records (e.g., add new customer)")
-    print(" - UPDATE:   Modify existing records (e.g., update customer city)")
-    print(" - DELETE:   Remove records without linked dependencies")
-    print(" - SCHEMA:   View structure (show tables, describe customers)")
-    print(" - COMMIT:   Save pending changes")
-    print(" - ROLLBACK: Undo uncommitted changes")
-    print(" - EXIT:     Quit the chatbot")
+    print("\nText-to-SQL Chatbot (Chroma RAG Mode)")
     print("--------------------------------\n")
 
     schema_text = load_schema()
+    index_schema_in_chroma(schema_text)  # Index once at startup
+
     conn = connect_db()
 
     try:
         while True:
-            user_input = input("Please type here: ").strip().lower()
-            if user_input == "exit":
+            print()  # adds a blank line before prompt
+            user_input = input("Please type here: ").strip()
+            if user_input.lower() == "exit":
                 print("Goodbye.")
                 break
-            elif user_input == "rollback":
+            elif user_input.lower() == "rollback":
                 conn.rollback()
                 print("All uncommitted changes rolled back.\n")
                 continue
-            elif user_input == "commit":
+            elif user_input.lower() == "commit":
                 conn.commit()
                 print("All pending changes committed.\n")
                 continue
 
-            print("\nGenerating SQL query...")
-            sql_query = ask_llm(user_input, schema_text)
+            rag_context = retrieve_schema_context(user_input)
+            sql_query = ask_llm(user_input, rag_context)
             print(f"\nSuggested SQL:\n{sql_query}\n")
 
             confirmation = input("Execute this query? (y/n): ").strip().lower()

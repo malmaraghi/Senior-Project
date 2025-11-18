@@ -1,9 +1,8 @@
 import ollama
 
-# Installed models: 'llama3.1:8b' / 'gemma3:4b'
-model_name = "llama3.1:8b"
+model_name = "llama3.2:latest" 
 
-def ask_llm(question, schema_text, model_name=model_name):
+def ask_llm(question, rag_context, model_name=model_name):
     prompt = f"""
 You are an expert SQL assistant for MariaDB.
 
@@ -30,7 +29,7 @@ Rules:
 
 The database schema is:
 
-{schema_text}
+{rag_context}
 
 User request: "{question}"
 
